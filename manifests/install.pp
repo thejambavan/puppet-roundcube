@@ -27,10 +27,10 @@ class roundcube::install inherits roundcube {
         extract       => true,
         cleanup       => false,
         extract_flags => '-x --no-same-owner -f',
-        require       => [
-          File[$roundcube::install_dir],
-          File[$roundcube::package_dir]
-        ],
+        #require       => [
+        #File[$roundcube::install_dir],
+        #File[$roundcube::package_dir]
+        #],
       }
       $require_archive = Archive["${roundcube::package_dir}/${archive}.tar.gz"]
     }
@@ -45,10 +45,10 @@ class roundcube::install inherits roundcube {
         src_target       => $roundcube::package_dir,
         root_dir         => "roundcubemail-${roundcube::version}",
         timeout          => 600,
-        require          => [
-          File[$roundcube::install_dir],
-          File[$roundcube::package_dir]
-        ],
+        #require          => [
+        #File[$roundcube::install_dir],
+        #File[$roundcube::package_dir]
+        #],
       }
       $require_archive = Archive[$archive]
     }
