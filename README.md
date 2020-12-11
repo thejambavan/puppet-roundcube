@@ -1,7 +1,9 @@
 # roundcube
 
+[![License](https://img.shields.io/github/license/tohuwabohu/puppet-roundcube.svg)](https://github.com/tohuwabohu/puppet-roundcube/blob/master/LICENSE.txt)
+[![Build Status](https://travis-ci.org/tohuwabohu/puppet-roundcube.svg?branch=master)](https://travis-ci.org/tohuwabohu/puppet-roundcube)
 [![Puppet Forge](https://img.shields.io/puppetforge/v/tohuwabohu/roundcube.svg)](https://forge.puppetlabs.com/tohuwabohu/roundcube)
-[![Build Status](https://travis-ci.org/tohuwabohu/puppet-roundcube.png?branch=master)](https://travis-ci.org/tohuwabohu/puppet-roundcube)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/tohuwabohu/roundcube.svg)](https://forge.puppetlabs.com/tohuwabohu/roundcube)
 
 ## Overview
 
@@ -144,11 +146,10 @@ roundcube::plugin { 'johndoh/markasjunk2':
 
 The module has been tested on the following operating systems. Testing and patches for other platforms are welcome.
 
-* Debian 7.0 (Wheezy)
-* Debian 8.0 (Jessie)
-* Ubuntu 12.04 (Precise Pangolin)
-* Ubuntu 14.04 (Trusty Tahr)
+* Debian 9.0 (Stretch)
+* Debian 10.0 (Buster)
 * Ubuntu 16.04 (Xenial Xerus)
+* Ubuntu 18.04 (Bionic Beaver)
 
 ## Contributing
 

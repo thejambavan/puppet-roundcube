@@ -14,14 +14,6 @@ describe 'roundcube' do
           ensure => directory,
         }
 
-        package { 'git':
-          ensure => installed,
-        }
-
-        package { 'php5-cli':
-          ensure => installed,
-        }
-
         class { 'roundcube': }
       EOS
     }
@@ -49,6 +41,10 @@ describe 'roundcube' do
       it { should be_mode 440 }
     end
 
+    describe command('php -l /var/www/roundcubemail/config/config.inc.php') do
+      its(:stdout) { should match /No syntax errors/ }
+    end
+
     describe file('/var/www/roundcubemail/installer') do
       it { should_not be_directory }
     end
@@ -66,11 +62,6 @@ describe 'roundcube' do
       it { should be_grouped_into 'www-data' }
       it { should be_mode 750 }
     end
-
-    describe file('/var/www/roundcubemail/vendor/pear/pear-core-minimal') do
-      # see https://github.com/tohuwabohu/puppet-roundcube/issues/2
-      it { should_not be_directory }
-    end
   end
 
   context 'with custom configuration' do
@@ -84,14 +75,6 @@ describe 'roundcube' do
 
         file { $required_directories:
           ensure => directory,
-        }
-
-        package { 'git':
-          ensure => installed,
-        }
-
-        package { 'php5-cli':
-          ensure => installed,
         }
 
         class { 'roundcube':
@@ -116,10 +99,14 @@ describe 'roundcube' do
 
     describe file('/var/www/roundcubemail/config/config.inc.php') do
       its(:content) { should match /^\$config\['default_host'\] = 'ssl:\/\/localhost';$/ }
-      its(:content) { should match /^\$config\['default_port'\] = '993';$/ }
+      its(:content) { should match /^\$config\['default_port'\] = 993;$/ }
       its(:content) { should match /^\$config\['des_key'\] = 'beefbeefbeefbeefbeefbeef';$/ }
       its(:content) { should match /^\$config\['language'\] = 'en_US';$/ }
       its(:content) { should match /^\$config\['support_url'\] = 'http:\/\/example\.com\/helpdesk';$/ }
+    end
+
+    describe command('php -l /var/www/roundcubemail/config/config.inc.php') do
+      its(:stdout) { should match /No syntax errors/ }
     end
   end
 
@@ -134,14 +121,6 @@ describe 'roundcube' do
 
         file { $required_directories:
           ensure => directory,
-        }
-
-        package { 'git':
-          ensure => installed,
-        }
-
-        package { 'php5-cli':
-          ensure => installed,
         }
 
         class { 'roundcube':
@@ -163,6 +142,10 @@ describe 'roundcube' do
 
     describe file('/var/www/roundcubemail/config/config.inc.php') do
       its(:content) { should match /^\$config\['support_url'\] = 'http:\/\/example\.com\/';$/ }
+    end
+
+    describe command('php -l /var/www/roundcubemail/config/config.inc.php') do
+      its(:stdout) { should match /No syntax errors/ }
     end
   end
 end

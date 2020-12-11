@@ -48,6 +48,9 @@
 #   that module installed since both cannot be recorded as a dependency in
 #   metadata.json at the same time.
 #
+# [*archive_proxy_server*]
+#   Proxy server to use with archive module. Example: "https://proxy.example.com:8080"
+#
 # [*db_dsn*]
 #   Set the database data source name (DSN) to be used when connecting to the database. Setting this parameter will
 #   override the other `db_*` parameters. See http://pear.php.net/manual/en/package.database.mdb2.intro-dsn.php for
@@ -99,6 +102,9 @@
 #   Specify custom Roundcube configuration settings. See config/defaults.inc.php in the roundcube directory for a
 #   complete list of possible configuration arguments.
 #
+# [*cronjobs_manage*]
+#   Whether to manage cronjobs for Roundcube: either `true` or `false`.
+#
 # === Copyright
 #
 # Copyright 2015 Martin Meinhold, unless otherwise noted.
@@ -114,10 +120,12 @@ class roundcube (
   $exec_paths                      = $roundcube::params::exec_paths,
   $composer_command_name           = $roundcube::params::composer_command_name,
   $composer_disable_git_ssl_verify = $roundcube::params::composer_disable_git_ssl_verify,
+  $composer_manage                 = $roundcube::params::composer_manage,
   $document_root                   = $roundcube::params::document_root,
   $document_root_manage            = $roundcube::params::document_root_manage,
 
   $archive_provider                = $roundcube::params::archive_provider,
+  $archive_proxy_server            = undef,
 
   $db_dsn                          = undef,
   $db_type                         = 'pgsql',
@@ -130,6 +138,8 @@ class roundcube (
   $imap_port                       = 143,
   $des_key                         = 'rcmail-!24ByteDESkey*Str',
   $plugins                         = [],
+  $plugins_manage                  = $roundcube::params::plugins_manage,
+  $cronjobs_manage                 = $roundcube::params::cronjobs_manage,
 
   $config_file_template            = undef,
   $options_hash                    = {},
@@ -142,6 +152,7 @@ class roundcube (
   validate_absolute_path($install_dir)
   validate_string($composer_command_name)
   validate_bool($composer_disable_git_ssl_verify)
+  validate_bool($composer_manage)
   validate_absolute_path($document_root)
   validate_bool($document_root_manage)
   validate_string($archive_provider)
@@ -153,7 +164,13 @@ class roundcube (
   validate_string($imap_host)
   validate_string($des_key)
   validate_array($plugins)
+  validate_bool($plugins_manage)
+  validate_bool($cronjobs_manage)
   validate_hash($options_hash)
+
+  if !empty($plugins) and $plugins_manage == false {
+    fail("Class[Roundcube]: conflicting parameters - plugin configuration disabled but plugins specified: ${plugins}")
+  }
 
   $env_git_ssl_no_verify = $composer_disable_git_ssl_verify ? {
     true    => ['GIT_SSL_NO_VERIFY=true'],
@@ -161,12 +178,12 @@ class roundcube (
   }
 
   $composer_exec_environment = flatten([
-    "HOME=${::root_home}",
+    "HOME=${::root_home}",  # root_home is provided by stdlib
     'COMPOSER_NO_INTERACTION=1',
     $env_git_ssl_no_verify,
   ])
 
-  class { 'roundcube::install': } ->
-  class { 'roundcube::config': } ~>
-  class { 'roundcube::service': }
+  class { 'roundcube::install': }
+  -> class { 'roundcube::config': }
+  ~> class { 'roundcube::service': }
 }

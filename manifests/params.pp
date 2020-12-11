@@ -7,8 +7,8 @@
 # Copyright 2016 Martin Meinhold, unless otherwise noted.
 #
 class roundcube::params {
-  $version = '1.1.5'
-  $checksum = '476a1d45b0592b2ad43e3e08cbc72e69ef31e33ed8a8f071f02e5a1ae3e7f334'
+  $version = '1.4.4'
+  $checksum = '2b8923836a0f83f9806fffc6dfa245705968a0005deab66c1056570eae11c7d7'  # complete edition
   $checksum_type = 'sha256'
 
   $archive_provider = 'camptocamp'
@@ -22,4 +22,8 @@ class roundcube::params {
   $exec_paths = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin']
   $composer_command_name = 'composer'
   $composer_disable_git_ssl_verify = false
+  $composer_manage = true
+
+  $plugins_manage = true
+  $cronjobs_manage = true
 }

@@ -3,10 +3,16 @@ require 'spec_helper'
 describe 'roundcube::plugin' do
   let(:title) { 'password' }
   let(:facts) { {:concat_basedir => '/path/to/dir'} }
-  let(:current_version) { '1.1.5' }
+  let(:current_version) { '1.4.4' }
   let(:install_dir) { "/opt/roundcubemail-#{current_version}" }
   let(:config_file) { "#{install_dir}/plugins/password/config.inc.php" }
-
+  let(:pre_condition) { <<-EOS
+      file { ['/opt', '/var/cache/puppet/archives']: ensure => directory }
+      
+      package { 'wget': }
+    EOS
+  }
+  
   describe 'by default' do
     let(:params) { {} }
 
@@ -18,5 +24,22 @@ describe 'roundcube::plugin' do
     let(:params) { {:options_hash => {'password_db_dsn' => 'psql://somewhere/else'}} }
 
     specify { should contain_concat__fragment("#{config_file}__custom_config").with_content(/^\$config\['password_db_dsn'\] = 'psql:\/\/somewhere\/else';$/) }
+  end
+
+  describe 'should fail when plugin configuration is disabled' do
+    let(:pre_condition) { <<-EOS
+        file { ['/opt', '/var/cache/puppet/archives']: ensure => directory }
+        
+        package { 'wget': }
+
+        class { 'roundcube':
+          plugins_manage => false,
+        }
+      EOS
+    }
+
+    it do
+      expect { should contain_concat(config_file) }.to raise_error(Puppet::Error, /conflicting parameters/)
+    end
   end
 end

@@ -8,7 +8,9 @@
 #
 class roundcube::install inherits roundcube {
 
-  include composer
+  if ($roundcube::composer_manage == true) {
+    include composer
+  }
 
   $archive = "roundcubemail-${roundcube::version}-complete"
   $target = "${roundcube::install_dir}/roundcubemail-${roundcube::version}"
@@ -22,6 +24,7 @@ class roundcube::install inherits roundcube {
         checksum      => $roundcube::checksum,
         checksum_type => $roundcube::checksum_type,
         source        => $download_url,
+        proxy_server  => $roundcube::archive_proxy_server,
         extract_path  => $roundcube::install_dir,
         creates       => "${roundcube::package_dir}/${archive}.tar.gz",
         extract       => true,
@@ -40,15 +43,17 @@ class roundcube::install inherits roundcube {
         digest_string    => $roundcube::checksum,
         digest_type      => $roundcube::checksum_type,
         url              => $download_url,
+        proxy_server     => $roundcube::archive_proxy_server,
         follow_redirects => true,
         target           => $roundcube::install_dir,
         src_target       => $roundcube::package_dir,
         root_dir         => "roundcubemail-${roundcube::version}",
         timeout          => 600,
-        #require          => [
-        #File[$roundcube::install_dir],
-        #File[$roundcube::package_dir]
-        #],
+        require          => [
+          # TODO consider using ensure_resources to avoid having to manage them explicitly
+          File[$roundcube::install_dir],
+          File[$roundcube::package_dir]
+        ],
       }
       $require_archive = Archive[$archive]
     }
@@ -79,14 +84,12 @@ class roundcube::install inherits roundcube {
     source  => "${target}/composer.json-dist",
     replace => false,
     owner   => 'root',
-    group   => 'root',
+    group   => 0,
     mode    => '0644',
     require => $require_archive,
   }
 
-  ->
-
-  augeas { "${target}/composer.json__prefer-stable":
+  -> augeas { "${target}/composer.json__prefer-stable":
     lens    => 'Json.lns',
     incl    => "${target}/composer.json",
     changes => [
@@ -95,10 +98,8 @@ class roundcube::install inherits roundcube {
     ],
   }
 
-  ->
-
-  exec { $composer_install_cmd:
-    unless      => "${composer_install_cmd} --dry-run 2>&1 | grep -q -F 'Nothing to install or update'",
+  -> exec { $composer_install_cmd:
+    unless      => "${composer_install_cmd} --dry-run 2>&1 | grep -q -F 'Nothing to install'",
     cwd         => $target,
     path        => $roundcube::exec_paths,
     environment => $roundcube::composer_exec_environment,
