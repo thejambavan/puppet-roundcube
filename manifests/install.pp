@@ -103,5 +103,6 @@ class roundcube::install inherits roundcube {
     cwd         => $target,
     path        => $roundcube::exec_paths,
     environment => $roundcube::composer_exec_environment,
+    user        => $roundcube::process
   }
 }
