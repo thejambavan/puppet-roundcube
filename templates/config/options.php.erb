@@ -1,7 +1,8 @@
 <% @options.keys.sort.each do |key| -%>
 <% value = @options[key] -%>
   <%- if value.is_a? Array -%>
-$config['<%= key %>'] = array(<%= value.map! { |element| "#{element}" }.join(', ') %>);
+# $config['<%= key %>'] = array(<%= value.map! { |element| "#{element}" }.join(', ') %>);
+$config['<%= key %>'] = array(<%= value.map! |element| "#{element}".join(', ') %>);
   <%- else -%>
 $config['<%= key %>'] = <%= (value.is_a? String) ? "'#{value}'" : value %>;
   <%- end -%>
