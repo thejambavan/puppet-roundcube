@@ -1,7 +1,7 @@
 # roundcube
 
 [![License](https://img.shields.io/github/license/tohuwabohu/puppet-roundcube.svg)](https://github.com/tohuwabohu/puppet-roundcube/blob/master/LICENSE.txt)
-[![Build Status](https://travis-ci.org/tohuwabohu/puppet-roundcube.svg?branch=master)](https://travis-ci.org/tohuwabohu/puppet-roundcube)
+[![build-and-test](https://github.com/tohuwabohu/puppet-roundcube/actions/workflows/main.yml/badge.svg)](https://github.com/tohuwabohu/puppet-roundcube/actions/workflows/main.yml)
 [![Puppet Forge](https://img.shields.io/puppetforge/v/tohuwabohu/roundcube.svg)](https://forge.puppetlabs.com/tohuwabohu/roundcube)
 [![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/tohuwabohu/roundcube.svg)](https://forge.puppetlabs.com/tohuwabohu/roundcube)
 
@@ -148,8 +148,8 @@ The module has been tested on the following operating systems. Testing and patch
 
 * Debian 9.0 (Stretch)
 * Debian 10.0 (Buster)
-* Ubuntu 16.04 (Xenial Xerus)
 * Ubuntu 18.04 (Bionic Beaver)
+* Ubuntu 20.04 (Focal Fossa)
 
 ## Contributing
 
@@ -165,7 +165,7 @@ This project uses rspec-puppet and beaker to ensure the module works as expected
 
 ```
 gem install bundler
-bundle install --path vendor
+bundle install
 
 bundle exec rake spec
 bundle exec rake beaker

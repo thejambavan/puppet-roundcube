@@ -12,7 +12,8 @@ class roundcube::config inherits roundcube {
   $config_file = "${application_dir}/config/config.inc.php"
 
   if empty($roundcube::db_dsn) {
-    $password = uriescape($roundcube::db_password)
+    $roundcube_db_password = $roundcube::db_password
+    $password = inline_template('<%= URI::DEFAULT_PARSER.escape(@roundcube_db_password) %>')
     $db_dsnw = "${roundcube::db_type}://${roundcube::db_username}:${password}@${roundcube::db_host}/${roundcube::db_name}"
   }
   else {
@@ -20,13 +21,30 @@ class roundcube::config inherits roundcube {
   }
 
   $options_defaults = {
-    'db_dsnw'      => $db_dsnw,
-    'default_host' => $roundcube::imap_host,
-    'default_port' => $roundcube::imap_port,
-    'des_key'      => $roundcube::des_key,
+    'db_dsnw' => $db_dsnw,
+    'des_key' => $roundcube::des_key,
   }
 
-  $options = merge($options_defaults, $roundcube::options_hash)
+  if versioncmp($roundcube::version, '1.6.0') < 0 {
+    $imap_defaults = {
+      'default_host' => $roundcube::imap_host,
+      'default_port' => $roundcube::imap_port,
+    }
+  } else {
+    # see https://github.com/roundcube/roundcubemail/releases/tag/1.6.0
+    $imap_defaults = {
+      'imap_host' => "${$roundcube::imap_host}:${$roundcube::imap_port}",
+    }
+
+    if 'smtp_server' in $roundcube::options_hash {
+      fail('As of 1.6, the \'smtp_server\' configuration option has been renamed to \'smtp_host\'. Please update your resource.')
+    }
+    if 'smtp_port' in $roundcube::options_hash {
+      fail('As of 1.6, the \'smtp_port\' configuration option has merged into \'smtp_host\'. Please update your resource.')
+    }
+  }
+
+  $options = merge($options_defaults, $imap_defaults, $roundcube::options_hash)
 
   concat { $config_file:
     owner => $roundcube::process,

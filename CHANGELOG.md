@@ -1,6 +1,91 @@
 # Change log
 
 All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org).
+                        
+## [v3.8.0](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.8.0) (2024-04-20)
+
+### Changed
+             
+- Dependency puppetlabs/stdlib: replace deprecated `uriescape` function 
+- CI: Support Puppet 8
+- CI: Remove EOL'ed Puppet 6 from test matrix
+
+## [v3.7.2](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.7.2) (2024-02-18)
+
+- Add support for puppetlabs/stdlib 9.x
+
+## [v3.7.1](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.7.1) (2023-06-24)
+
+### Updated
+
+- OS compatibility: remove Debian 9, add Debian 11, remove Ubuntu 18.04, add Ubuntu 22.04
+
+## [v3.7.0](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.7.0) (2023-06-22)
+
+### Updated
+
+- Replace deprecated `is_` and `validate_` puppetlabs/stdlib functions with Puppet data types; as data types are 
+  available since Puppet 5, this is considered a backward-compatible change
+
+## [v3.6.1](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.6.1) (2023-06-19)
+
+### Improved
+
+- unit-tests: Removed EOL'd Puppet 5 from test matrix
+- unit-tests: Bumped Puppet 6 Ruby version to 2.7
+
+### Updated
+
+- Puppet module dependencies: puppetlabs-concat and -stdlib
+
+## [v3.6.0](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.6.0) (2022-10-08)
+           
+### Summary
+
+Add support for [roundcube 1.6](https://github.com/roundcube/roundcubemail/releases/tag/1.6.0). As there are breaking 
+changes, please make sure you've read the changelog. Also don't forget to apply the database changes.
+                    
+### Added
+
+- Allow to configure the user used to execute the composer command; defaults to `root` ([#38](https://github.com/tohuwabohu/puppet-roundcube/issues/38))
+
+### Changed
+
+- Make module compatible with roundcube 1.6 by renaming `default_host` to `imap_host` and merging `default_port` into 
+  `imap_host`.
+- Fail Puppet run if 1.6 is used with outdated parameters (e.g. `smtp_server`)
+
+## [v3.5.3](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.5.3) (2022-09-21)
+              
+Note: this release has been removed from the forge as it was incompatible with version 1.6 of roundcube.
+
+### Changed
+
+- Update roundcube version to 1.6.0 from 1.4.4; this also fixed the composer error complaining about missing plugins in 
+  allow-plugins list
+- Mark latest versions of stdlib and concat dependencies as compatible
+- Replace discontinued plugin johndoh/markasjunk2 in acceptance tests with roundcube/rcsample
+
+## [v3.5.2](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.5.2) (2021-02-13)
+                                                                      
+### Changed
+
+- Mark all versions of Puppet 7 as supported
+
+## [v3.5.1](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.5.1) (2021-02-13)
+           
+### Deprecated
+
+- `camptocamp` as default for `archive_provider`; will be replaced with `puppet` as per deprecation notice on 
+  [camptocamp/archive](https://forge.puppet.com/modules/camptocamp/archive)  
+
+### Changed
+               
+- Rename default branch to `main`
+- Migrate from travis-ci.org to Github Actions due to pending shutdown :sob:
+- Add Puppet 7 unit tests
+- Replace Ubuntu 16.04 with Ubuntu 20.04 in acceptance test matrix
+- Mark latest versions of stdlib and concat dependencies as compatible
 
 ## [v3.5.0](https://github.com/tohuwabohu/puppet-roundcube/tree/v3.5.0) (2020-06-13)
 

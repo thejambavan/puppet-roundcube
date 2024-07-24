@@ -3,13 +3,11 @@ require 'spec_helper'
 describe 'roundcube::plugin' do
   let(:title) { 'password' }
   let(:facts) { {:concat_basedir => '/path/to/dir'} }
-  let(:current_version) { '1.4.4' }
+  let(:current_version) { '1.6.0' }
   let(:install_dir) { "/opt/roundcubemail-#{current_version}" }
   let(:config_file) { "#{install_dir}/plugins/password/config.inc.php" }
   let(:pre_condition) { <<-EOS
       file { ['/opt', '/var/cache/puppet/archives']: ensure => directory }
-      
-      package { 'wget': }
     EOS
   }
   
@@ -30,8 +28,6 @@ describe 'roundcube::plugin' do
     let(:pre_condition) { <<-EOS
         file { ['/opt', '/var/cache/puppet/archives']: ensure => directory }
         
-        package { 'wget': }
-
         class { 'roundcube':
           plugins_manage => false,
         }

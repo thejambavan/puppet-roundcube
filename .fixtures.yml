@@ -5,24 +5,20 @@ fixtures:
       ref: "0.8.1"
     composer:
       repo: "https://github.com/willdurand/puppet-composer.git"
-      ref: "1.2.6"
+      ref: "1.2.10"
     concat:
       repo: "https://github.com/puppetlabs/puppetlabs-concat.git"
-      ref: "4.2.1"
+      ref: "v9.0.2"
     stdlib:
       repo: "https://github.com/puppetlabs/puppetlabs-stdlib.git"
-      ref: "4.25.1"
+      ref: "v9.4.1"
     # provided by puppet-agent
     augeas:
-      repo: "git://github.com/puppetlabs/puppetlabs-augeas_core"
-      ref: "1.0.5"
+      repo: "https://github.com/puppetlabs/puppetlabs-augeas_core"
+      ref: "v1.2.0"
     cron:
-      repo: "git://github.com/puppetlabs/puppetlabs-cron_core"
-      ref: "1.0.4"
-    # transitive dependencies
-    wget:
-      repo: "https://github.com/maestrodev/puppet-wget.git"
-      ref: "v1.7.3"
+      repo: "https://github.com/puppetlabs/puppetlabs-cron_core"
+      ref: "v1.2.0"
   symlinks:
     roundcube: "#{source_dir}"
 

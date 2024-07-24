@@ -2,15 +2,13 @@ require 'spec_helper'
 
 describe 'roundcube', :type => :class do
   let(:title) { 'roundcube' }
-  let(:current_version) { '1.4.4' }
+  let(:current_version) { '1.6.0' }
   let(:archive_name) { "roundcubemail-#{current_version}-complete" }
   let(:install_dir) { "/opt/roundcubemail-#{current_version}" }
   let(:config_file) { "#{install_dir}/config/config.inc.php" }
   let(:config_file_options_fragment) { "#{config_file}__options" }
   let(:pre_condition) { <<-EOS
       file { ['/opt', '/somewhere/else', '/var/cache/puppet/archives']: ensure => directory }
-      
-      package { 'wget': }
     EOS
   }
 
@@ -23,6 +21,9 @@ describe 'roundcube', :type => :class do
     }
     specify { should contain_concat__fragment("#{config_file}__plugins_head") }
     specify { should contain_concat__fragment("#{config_file}__plugins_tail") }
+    specify { should contain_exec('composer install --no-dev').with(
+        'user' => 'root'
+    )}
   end
 
   describe 'installs custom version' do
@@ -75,7 +76,7 @@ describe 'roundcube', :type => :class do
     let(:params) { {:document_root_manage => 'false'} }
 
     specify do
-      expect { should contain_archive(archive_name) }.to raise_error(Puppet::Error, /is not a boolean/)
+      expect { should contain_archive(archive_name) }.to raise_error(Puppet::Error, /expects a Boolean value/)
     end
   end
 
@@ -83,7 +84,7 @@ describe 'roundcube', :type => :class do
     let(:params) { {:document_root_manage => 'invalid'} }
 
     specify do
-      expect { should contain_archive(archive_name) }.to raise_error(Puppet::Error, /invalid/)
+      expect { should contain_archive(archive_name) }.to raise_error(Puppet::Error, /expects a Boolean value/)
     end
   end
 
@@ -94,15 +95,27 @@ describe 'roundcube', :type => :class do
   end
 
   describe 'creates configuration file with proper imap host' do
-    let(:params) { {:imap_host => 'ssl://localhost'} }
+    let(:params) { {:imap_host => 'ssl://example.com'} }
 
-    specify { should contain_concat__fragment(config_file_options_fragment).with_content(/^\$config\['default_host'\] = 'ssl:\/\/localhost';$/) }
+    specify { should contain_concat__fragment(config_file_options_fragment).with_content(/^\$config\['imap_host'\] = 'ssl:\/\/example.com:143';$/) }
   end
 
   describe 'creates configuration file with proper imap port' do
     let(:params) { {:imap_port => 993} }
 
-    specify { should contain_concat__fragment(config_file_options_fragment).with_content(/^\$config\['default_port'\] = [']?993[']?;$/) }
+    specify { should contain_concat__fragment(config_file_options_fragment).with_content(/^\$config\['imap_host'\] = 'localhost:993'?;$/) }
+  end
+
+  describe 'creates configuration file with proper imap host (1.5.x compatibility)' do
+    let(:params) { {:version => '1.5.0', :imap_host => 'ssl://example.com'} }
+
+    specify { should contain_concat__fragment('/opt/roundcubemail-1.5.0/config/config.inc.php__options').with_content(/^\$config\['default_host'\] = 'ssl:\/\/example.com';$/) }
+  end
+
+  describe 'creates configuration file with proper imap port (1.5.x compatibility)' do
+    let(:params) { {:version => '1.5.0', :imap_port => 993} }
+
+    specify { should contain_concat__fragment('/opt/roundcubemail-1.5.0/config/config.inc.php__options').with_content(/^\$config\['default_port'\] = '?993'?;$/) }
   end
 
   describe 'creates configuration file with salt' do
@@ -122,6 +135,14 @@ describe 'roundcube', :type => :class do
     let(:params) { {:options_hash => {'language' => 'en_US'}} }
 
     specify { should contain_concat__fragment(config_file_options_fragment).with_content(/^\$config\['language'\] = 'en_US';$/) }
+  end
+
+  describe 'raises an error about changed configuration options' do
+    let(:params) { {:options_hash => {'smtp_server' => 'localhost'}} }
+
+    it do
+      expect { should contain_archive(config_file_options_fragment) }.to raise_error(Puppet::Error, /configuration option has been renamed/)
+    end
   end
 
   describe 'ensures the logs directory is writable by the webserver' do
@@ -161,5 +182,13 @@ describe 'roundcube', :type => :class do
     it do
       expect { should contain_archive(archive_name) }.to raise_error(Puppet::Error, /conflicting parameters/)
     end
+  end
+
+  describe 'runs composer install command as the specified user' do
+    let(:params) { {:composer_user => 'nobody'} }
+
+    specify { should contain_exec('composer install --no-dev').with(
+        'user' => 'nobody'
+    )}
   end
 end
